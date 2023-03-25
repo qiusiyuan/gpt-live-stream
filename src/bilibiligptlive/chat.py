@@ -9,8 +9,8 @@ admin_setting = {"role": "system", "content": "你现在是一个活泼可爱的
 messages = []
 
 # Function to send a message to ChatGPT and get a response
-def chatgpt_response(prompt):
-    message = compose_message(prompt)
+def chatgpt_response(prompts):
+    message = compose_message(prompts)
     print(message)
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -30,11 +30,12 @@ def add_message(new_message):
     global messages
     messages.append(new_message)
 
-def compose_message(prompt):
+def compose_message(prompts):
     global messages
-    messages.append(
-        {"role": "user","content":prompt}
-    )
+    for prompt in prompts:
+        messages.append(
+            {"role": "user","content":prompt}
+        )
     return [admin_setting] + messages
 
 
