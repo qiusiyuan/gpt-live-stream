@@ -7,8 +7,10 @@ if __name__=="__main__":
     last_res_time = time.time()
     while True:
         messages = get_dm_history()
+        print(messages)
         if messages: 
             response_ai = chatgpt_response(messages)
+            print(response_ai)
             synthesize_text(response_ai)
             last_res_time = time.time()
 

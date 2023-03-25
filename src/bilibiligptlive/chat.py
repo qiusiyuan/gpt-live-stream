@@ -1,19 +1,29 @@
 import openai
+import tiktoken
 
 openai_api_key = ""
 
 openai.api_key = openai_api_key
 
-admin_setting = {"role": "system", "content": "你现在是一个活泼可爱的直播机器人，你将接收到观众的弹幕，请友好风趣的回应他们吧，你不用回应所有弹幕，但请挑比较有趣的回复。"}
+admin_setting = {"role": "system", "content": "你现在是一个活泼可爱的直播机器人，你将接收到观众的弹幕，请友好风趣的回应他们吧，你不用回应所有弹幕，但请挑比较有趣的回复。你可以调侃用户的昵称。你不能说任何违规内容。你的回复不用全部都带表情。"}
 
 messages = []
+
+model_name = "gpt-3.5-turbo"
+# Initialize Tokenizer
+tokenizer = tiktoken.encoding_for_model(model_name)
+
+MAX_TOKENS = 4096
+
+# Function to count tokens in a message
+def count_tokens(text):
+    return len(tokenizer.encode(text))
 
 # Function to send a message to ChatGPT and get a response
 def chatgpt_response(prompts):
     message = compose_message(prompts)
-    print(message)
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model=model_name,
         messages=message,
         temperature=0.5,
         max_tokens=150,
@@ -29,6 +39,8 @@ def chatgpt_response(prompts):
 def add_message(new_message):
     global messages
     messages.append(new_message)
+    while total_tokens() > MAX_TOKENS:
+        evict_oldest_message()
 
 def compose_message(prompts):
     global messages
@@ -38,7 +50,19 @@ def compose_message(prompts):
         )
     return [admin_setting] + messages
 
+def total_tokens():
+    global messages
+    tokens = sum([count_tokens(msg["content"]) for msg in messages])
+    tokens += len(messages)  # Add tokens for message roles and other fields
+    return tokens
+
+def evict_oldest_messages(n=10):
+    global messages
+    if len(messages) >= n:
+        messages = messages[n:]
+    else:
+        messages.pop(0)
+
 
 if __name__ == "__main__":
     print(chatgpt_response("BuibuibuiOOOOO: 测试"))
-
