@@ -25,9 +25,14 @@ url = f"https://api.live.bilibili.com/xlive/web-room/v1/dM/gethistory?roomid={ro
 
 # Function to send a message to ChatGPT and get a response
 def chatgpt_response(prompt):
-    response = openai.Completion.create(
-        engine="davinci-codex",
-        prompt=prompt,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Who won the world series in 2020?"},
+        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+        {"role": "user", "content": "Where was it played?"}
+    ]
         temperature=0.5,
         max_tokens=150,
         top_p=1,
